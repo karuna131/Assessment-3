@@ -1,27 +1,32 @@
-import { useQuery } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 
 function RecipeDetails(){
+    const [data, setData] = useState();
+    const [isLoading, setLoading] = useState(true);
+    const [error, setError] = useState(null)
     const {id} = useParams();
     
-    async function fetchData(){
-        const respone = await fetch(`https://dummyjson.com/recipes/${id}`)
-        if(!respone.ok){
-            throw new Error('Recipe Details Not Found')
+    useEffect(()=>{
+        async function fetchData(){
+           try {
+                const respone = await fetch(`https://dummyjson.com/recipes/${id}`)
+                if(!respone.ok){
+                    throw new Error('Recipe Details Not Found')
+                }
+                const getData = await respone.json()
+                setData(getData)
+           } catch (error) {
+                setError(error.message)
+           }finally{
+                setLoading(false);
+           }
         }
-        const getData = await respone.json()
-        return getData;
-    }
+        fetchData();
+    }, [])
 
-    const {data, isPending, isError, error} = useQuery({
-        queryKey : ['Recipes'],
-        queryFn : fetchData
-    })
-
-    if(isPending) return <h1>....Loading</h1>
-    if(isError) return <h1>{error.message}</h1>
-
-    console.log('check Data', data)
+    if(isLoading) return <h1>....Loading</h1>
+    if(error) return <h1>{error.message}</h1>
 
     return (
         <>

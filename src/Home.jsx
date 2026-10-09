@@ -16,16 +16,21 @@ function Home(){
 
     let inputRef = useRef(null);
     
-    useEffect(()=>{
-        inputRef.current.focus();
-    }, [])
+    // useEffect(()=>{
+    //     inputRef.current.focus();
+    // }, [])
     
     const {data, isPending, isError, error} = useQuery({
         queryKey : ['Recipes'],
         queryFn : fetchData
     })
-    
 
+    useEffect(() => {
+        if (!isPending && inputRef.current) {
+            inputRef.current.focus();
+        }
+    }, [isPending]);
+    
     if(isPending) return <h1>....Loading</h1>
     if(isError) return <h1>{error.message}</h1>
 
